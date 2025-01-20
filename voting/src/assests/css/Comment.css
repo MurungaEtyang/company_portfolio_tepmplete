@@ -1,0 +1,269 @@
+.media-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.media-gallery img,
+.media-gallery video {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.media-gallery img:hover,
+.media-gallery video:hover {
+    transform: scale(1.2);
+}
+
+.media-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.media-modal-content {
+    position: relative;
+    text-align: center;
+}
+
+.media-modal img,
+.media-modal video {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.close-button,
+.prev-button,
+.next-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    font-size: 20px;
+}
+
+.close-button {
+    top: 10%;
+    right: 10%;
+}
+
+.prev-button {
+    left: 10%;
+}
+
+.next-button {
+    right: 10%;
+}
+
+.reply-button {
+    cursor: pointer;
+    color: #007bff;
+}
+
+.media-preview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    gap: 20px;
+}
+
+.media-preview:hover {
+    transform: scale(1.2);
+}
+
+.media-modal img,
+.media-modal video {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+/* Container for the comment and its replies */
+.comments-section {
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Main comment styling */
+.card {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #ffffff;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Profile picture for the comment author */
+.card-text .fa-user {
+    margin-right: 8px;
+    font-size: 14px;
+    color: #1da1f2; /* Twitter Blue */
+}
+
+/* Styling the reply section */
+.replies-section {
+    margin-top: 15px;
+    padding-left: 20px; /* Indent replies */
+}
+
+/* Individual reply card styling */
+.replies-section .card {
+    border: 1px solid #e1e8ed;
+    background-color: #f5f8fa; /* Light gray background for replies */
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: none; /* No shadow for replies */
+}
+
+/* Profile picture for the reply author */
+.replies-section .card-text .fa-user {
+    margin-right: 8px;
+    font-size: 14px;
+    color: #1da1f2; /* Twitter Blue */
+}
+
+/* Reply text */
+.replies-section .card-text {
+    font-size: 14px;
+    color: #14171a; /* Dark gray for text */
+    line-height: 1.4;
+}
+
+/* Media in replies */
+.replies-section .media-gallery {
+    margin-top: 10px;
+}
+
+.replies-section .media-gallery img,
+.replies-section .media-gallery video {
+    height: 100px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+
+/* Buttons (Reply, Share, Like) */
+.card .card-text {
+    font-size: 14px;
+    color: #657786; /* Twitter gray */
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.card .card-text .fa-reply,
+.card .card-text .fa-share,
+.card .card-text .fa-thumbs-up {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.card .card-text .fa-reply:hover,
+.card .card-text .fa-share:hover,
+.card .card-text .fa-thumbs-up:hover {
+    color: #1da1f2; /* Twitter Blue on hover */
+}
+
+/* Button for showing more media (optional) */
+.show-all-media {
+    background-color: transparent;
+    border: none;
+    color: #1da1f2;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.show-all-media:hover {
+    text-decoration: underline;
+}
+
+/* Modal (image/video) for viewing media */
+.media-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.media-modal-content {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    position: relative;
+    max-width: 80%;
+}
+
+.media-modal img,
+.media-modal video {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #1da1f2;
+}
+
+.prev-button,
+.next-button {
+    background-color: transparent;
+    border: none;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.prev-button:hover,
+.next-button:hover {
+    color: #1da1f2;
+}
+
+.prev-button {
+    left: 10px;
+}
+
+.next-button {
+    right: 10px;
+}

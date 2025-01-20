@@ -1,0 +1,41 @@
+.home-container{
+    background-size: cover;
+    background-position: center;
+}
+
+.text-home-titles{
+    width: 80vw;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+}
+
+
+
+.text-home-titles h1{
+    font-size: 55px !important;
+    text-align: unset !important;
+}
+
+.text-home-titles p{
+    font-size: 30px !important;
+    text-align: unset !important;
+}
+
+.input-group{
+    width: 100%;
+    height: 50px;
+}
+.input-group-append{
+    height: 50px;
+    margin-left: 10px;
+}
+
+.home-text-center {
+    color: white;
+    text-align: center;
+    font-size: 30px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+}

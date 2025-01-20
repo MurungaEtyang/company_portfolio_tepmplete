@@ -1,0 +1,30 @@
+
+.scroll-to-top, .scroll-to-share  {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 10px;
+    font-size: 24px;
+    background-color: rgba(0, 123, 255, 0);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);
+    transition: opacity 0.3s;
+}
+
+.scroll-to-share {
+    bottom: 80px;
+}
+
+@media (max-width: 768px) {
+    .scroll-to-top {
+        right: 10px;
+        bottom: 10px;
+    }
+    .scroll-to-share {
+        right: 10px;
+        bottom: 60px;
+    }
+}

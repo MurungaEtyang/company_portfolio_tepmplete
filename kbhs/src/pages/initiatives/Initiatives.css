@@ -1,0 +1,37 @@
+
+.initiatives-project-title,
+.initiatives-dedicated-team-name {
+    text-align: center;
+}
+
+.initiatives-project-description {
+    font-size: 1rem;
+    text-align: center;
+}
+
+
+.initiatives-header-buttons button {
+    background-color: transparent;
+    color: #ffffff;
+    width: auto;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin: 5px;
+    padding: 5px 15px;
+    border: 1px solid white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.initiatives-header-buttons button:hover {
+    background-color: rgba(0, 2, 110, 0.17);
+    color: rgb(207, 209, 218);
+}
+
+.initiatives-section-title{
+    font-size: 40px;
+}
