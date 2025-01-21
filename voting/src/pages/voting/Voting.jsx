@@ -3,6 +3,7 @@ import { Button, Alert } from "reactstrap";
 import {FaCopy, FaQuestionCircle, FaThumbsDown, FaThumbsUp} from "react-icons/fa";
 import { toast } from "react-toastify";
 import {responseFromServer} from "../../api-services/voting";
+import {placeVote} from "../../api-services/votes/placeVote";
 
 const Voting = () => {
     const [vote, setVote] = useState(null);
@@ -14,9 +15,11 @@ const Voting = () => {
     const handleVote = (voteOption) => {
         if (!hasVoted) {
             localStorage.setItem("hasVoted", "true");
-            localStorage.setItem("vote", voteOption);
-            setVote(voteOption);
-            setMessage(`Vote successful! You voted: ${voteOption}`);
+            localStorage.setItem("vote", voteOption.charAt(0).toUpperCase() + voteOption.slice(1));
+            setVote(voteOption.charAt(0).toUpperCase() + voteOption.slice(1));
+            setMessage(`Vote successful! You voted: ${voteOption.charAt(0).toUpperCase() + voteOption.slice(1)}`);
+            console.log(voteOption);
+            placeVote(voteOption)
         }
     };
 
@@ -32,7 +35,7 @@ const Voting = () => {
                 <Button
                     key={index}
                     onClick={() => handleVote(option)}
-                    color={option === "yes" ? "success" : option === "no" ? "danger" : "warning"}
+                    color={option === "Yes" ? "success" : option === "No" ? "danger" : "warning"}
                     style={{ marginRight: "10px" }}
                     disabled={hasVoted}
                 >
