@@ -21,10 +21,26 @@
 @media (max-width: 768px) {
     .scroll-to-top {
         right: 10px;
-        bottom: 10px;
+        bottom: 50px;
     }
     .scroll-to-share {
         right: 10px;
-        bottom: 60px;
+        bottom: 100px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .fixed-icons {
+        display: flex;
+        gap: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background-color: white;
+        z-index: 1;
+        transition: all 0.5s ease-in-out;
     }
 }

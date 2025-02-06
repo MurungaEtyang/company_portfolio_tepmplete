@@ -54,14 +54,14 @@ const Voting = () => {
                             </p>
                             
                             <div>
-                                <span>Airtel Money: {responseFromServer.donationInfo.airtelNumber}</span>
+                                <span>{responseFromServer.donationInfo.airtelNumber}</span>
                                 <FaCopy
                                     style={{ marginLeft: "10px", cursor: "pointer" }}
                                     onClick={() => copyToClipboard(responseFromServer.donationInfo.airtelNumber)}
                                 />
                             </div>
                             <div style={{ marginTop: "10px" }}>
-                                <span>M-Pesa: {responseFromServer.donationInfo.mpesaNumber}</span>
+                                <span>{responseFromServer.donationInfo.mpesaNumber}</span>
                                 <FaCopy
                                     style={{ marginLeft: "10px", cursor: "pointer" }}
                                     onClick={() => copyToClipboard(responseFromServer.donationInfo.mpesaNumber)}

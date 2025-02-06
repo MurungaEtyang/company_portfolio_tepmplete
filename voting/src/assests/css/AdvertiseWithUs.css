@@ -1,0 +1,101 @@
+
+
+
+.advertise-container {
+    width: 100vw;
+    margin: 50px auto;
+    background: #000000;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+}
+
+.container h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #444;
+    text-align: center;
+}
+
+form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: black;
+}
+
+/* Input Fields */
+form input,
+form select,
+form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: rgba(23, 23, 23, 0.52);
+    transition: border-color 0.3s ease;
+    color: white;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border-color: #0077ff;
+    outline: none;
+    background-color: #000000;
+}
+
+/* Textarea */
+form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Submit Button */
+form button[type="submit"] {
+    background-color: #0077ff;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+form button[type="submit"]:hover {
+    background-color: #0056cc;
+}
+
+/* Success Message */
+.success-message {
+    color: #28a745;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        font-size: 13px;
+    }
+
+    form button[type="submit"] {
+        font-size: 14px;
+        padding: 10px;
+    }
+}

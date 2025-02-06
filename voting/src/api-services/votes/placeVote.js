@@ -1,9 +1,10 @@
-import login from "./login";
+
 import {apiUrl} from "./api-url";
+import {getToken} from "../token";
 
 
 export const placeVote = async (voteOption) => {
-    const token = await login();
+    const token = await getToken();
 
     const response = await fetch(`${apiUrl.baseUrl}/api/kenf/v1/votes`, {
         method: 'POST',

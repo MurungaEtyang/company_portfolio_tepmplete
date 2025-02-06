@@ -1,7 +1,7 @@
 export const privacyPolicyData = {
     title: "Privacy Policy",
     intro: {
-        heading: "Welcome to [Your Platform Name]!",
+        heading: "Welcome!",
         text: "This platform empowers citizens to voice their opinions on government performance and advocate for accountability. We prioritize your privacy and security, ensuring your participation remains anonymous and confidential. This Privacy Policy outlines how we handle any data associated with your use of our platform.",
     },
     dataCollection: {
@@ -100,14 +100,8 @@ export const privacyPolicyData = {
         heading: "Contact Us",
         text: "If you have questions or concerns about this policy, please contact us at:",
         list: [
-            {
-                heading: "Email:",
-                text: "support@[yourplatform].com"
-            },
-            {
-                heading: "Website:",
-                text: "[yourplatform].com"
-            }
+            "Email: info@kbhacksandsolutuions.com",
+            "Phone: 123-456-7890"
         ]
     }
 };

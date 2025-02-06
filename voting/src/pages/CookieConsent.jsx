@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../assests/css/CookieConsent.css";
 import {Link} from "react-router-dom";
 import {cookieConsentData} from "../api-services/CookieConsent";
+import NavBar from "../components/NavBar";
 
 
 const CookieConsent = () => {
@@ -26,6 +27,10 @@ const CookieConsent = () => {
 
     return (
         <>
+            <section>
+                <NavBar onClick={() => {
+                }}/>
+            </section>
             {showConsent && (
                 <div className="cookie-consent-banner">
                     <p>

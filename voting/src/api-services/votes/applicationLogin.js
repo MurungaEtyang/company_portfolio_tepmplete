@@ -3,7 +3,7 @@ import { apiUrl, loginCredentials } from "./api-url";
 const email = loginCredentials.email;
 const password = loginCredentials.password;
 
-const login = async () => {
+const applicationLogin = async () => {
     try {
         const response = await fetch(apiUrl.baseUrl + '/api/kenf/v1/login', {
             method: 'POST',
@@ -18,14 +18,17 @@ const login = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data.token);
             return data.token;
         } else {
             console.log('Login failed:', response.status);
+            throw new Error('Failed to login');
         }
     } catch (error) {
         console.error('Error during login:', error);
+        throw error;
     }
 };
 
-export default login;
+
+
+export default applicationLogin;

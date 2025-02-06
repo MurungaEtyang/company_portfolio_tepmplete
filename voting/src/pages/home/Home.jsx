@@ -12,18 +12,21 @@ const Home = () => {
     const [username, setUsername] = useState('');
     const [voteSummary, setVoteSummary] = useState({ labels: [], count: [] });
 
-    const handleUsernameChange = (e) => {
-        setUsername(e.target.value);
-    };
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const summary = await summaryVotes();
+            const labels = summary?.map(s => s.label) || [];
+            const count = summary?.map(s => s.count) || [];
+            setVoteSummary({ labels, count });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const handleComment = () => {
         setShowInput(true);
     };
 
-    const handleCommentSubmit = (data) => {
-        console.log("Comment submitted:", { username, ...data });
-        setShowInput(false);
-    };
 
     const handleButtonClick = () => {
         setShowDialog(true);
@@ -32,17 +35,6 @@ const Home = () => {
     const closeDialog = () => {
         setShowDialog(false);
     };
-
-    const getSummaryVotes = async () => {
-        const summary = await summaryVotes();
-        const labels = summary?.map(s => s.label) || [];
-        const count = summary?.map(s => s.count) || [];
-        setVoteSummary({ labels, count });
-    };
-
-    useEffect(() => {
-        getSummaryVotes();
-    }, []);
 
     return (
         <>
@@ -73,16 +65,8 @@ const Home = () => {
                         </Card>
                         {showInput && (
                             <div style={{ marginTop: '10px' }}>
-                                <Input
-                                    type="text"
-                                    value={username}
-                                    onChange={handleUsernameChange}
-                                    placeholder="Enter your username"
-                                    style={{ marginBottom: '10px' }}
-                                />
                                 <Comment
-                                    onSubmit={handleCommentSubmit}
-                                    username={username}
+                                    replyToUsername={username}
                                 />
                             </div>
                         )}

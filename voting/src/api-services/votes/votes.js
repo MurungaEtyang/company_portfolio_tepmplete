@@ -1,9 +1,10 @@
 import {apiUrl} from "./api-url";
-import login from "./login";
+import getComments from "../post/comments";
+import {getToken} from "../token";
 
 export const summaryVotes = async () => {
     try {
-        const token = await login();
+        const token = await getToken();
 
         const response = await fetch(`${apiUrl.baseUrl}/api/kenf/v1/votes/summary`, {
             method: 'GET',
@@ -19,14 +20,17 @@ export const summaryVotes = async () => {
 
         const {yes, no, neutral, total} = await response.json();
 
+        await getComments()
         return [
-            {label: 'R', count: yes},
-            {label: 'S', count: no},
-            {label: 'N', count: neutral},
+            {label: 'YES', count: yes},
+            {label: 'NO', count: no},
+            {label: 'NEUTRAL', count: neutral},
             {label: 'Votes', count: total},
         ];
+
     } catch (error) {
         console.error('Error fetching summary votes:', error);
-        return [{label: 'R', count: 0}, {label: 'S', count: 0}, {label: 'N', count: 0}, {label: 'Votes', count: 0}];
+        return [{label: 'YES', count: 0}, {label: 'NO', count: 0}, {label: 'NEURAL', count: 0}, {label: 'Votes', count: 0}];
     }
 }
+

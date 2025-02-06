@@ -1,25 +1,32 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Container, Row, Col, Button, Form, FormGroup, Input, Label, Alert } from "reactstrap";
+import { FaFileImage } from "react-icons/fa";
+import { ClipLoader } from "react-spinners";
 import "../../assests/css/Comment.css";
-import FadeInSection from "../../components/FadeInSection";
-import { FaFileImage, FaCamera } from "react-icons/fa";
+import MediaPreview from "./MediaPreview";
+import responseFromServer from "../../api-services/post/post";
 
-const Comment = ({ parentId = null, onSubmit, replyToUsername = null }) => {
+const Comment = ({ parentId = null, replyToUsername = null }) => {
     const [commentText, setCommentText] = useState("");
     const [media, setMedia] = useState([]);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-
-    // Reference to the file input for the camera
-    const cameraInputRef = useRef(null);
+    const [userName, setUserName] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleTextChange = (e) => setCommentText(e.target.value);
+
+    const handleUsernameChange = (e) => {
+        const value = e.target.value;
+        setUserName(value);
+    };
 
     const handleMediaChange = (e) => {
         const files = Array.from(e.target.files);
         const newMedia = files.map((file) => ({
-            file,
-            preview: URL.createObjectURL(file),
+            url: file,
+            type: file.type.includes("image") ? "image" : "video",
+            alt: file.type.includes("image") ? "Image" : "Video",
         }));
         setMedia((prevMedia) => [...prevMedia, ...newMedia]);
     };
@@ -28,35 +35,30 @@ const Comment = ({ parentId = null, onSubmit, replyToUsername = null }) => {
         setMedia((prevMedia) => prevMedia.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!commentText.trim()) {
-            setError("Comment text is required.");
-            return;
-        }
-
         setError("");
+        setLoading(true);
 
         const commentData = {
             commentText,
-            media: media.map((m) => m.file),
+            media,
             parentId,
             replyToUsername,
         };
 
-        console.log("Submitting comment data:", commentData);
 
-        onSubmit(commentData);
-
-        setSuccess(parentId ? "Reply submitted successfully!" : "Comment submitted successfully!");
-        setCommentText("");
-        setMedia([]);
-    };
-
-    const handleCameraClick = () => {
-        if (cameraInputRef.current) {
-            cameraInputRef.current.click(); // Trigger the file input click to open the camera
+        try {
+            const response = await responseFromServer(userName, commentData.commentText, commentData.media);
+            setSuccess(response.message);
+            setError(response.error)
+            setCommentText("");
+            setMedia([]);
+        } catch (err) {
+            setError("Failed to submit your comment. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,11 +68,21 @@ const Comment = ({ parentId = null, onSubmit, replyToUsername = null }) => {
                 <Col xs="12">
                     <Form onSubmit={handleSubmit}>
                         {replyToUsername && (
-                            <p>
+                            <p style={{ color: "red", marginBottom: "10px" }}>
                                 Replying to <strong>@{replyToUsername}</strong>
                             </p>
                         )}
-
+                        {!parentId && (
+                            <FormGroup>
+                                <Input
+                                    type="text"
+                                    value={userName}
+                                    onChange={handleUsernameChange}
+                                    placeholder="Enter your username"
+                                    style={{ marginBottom: "10px" }}
+                                />
+                            </FormGroup>
+                        )}
                         <FormGroup>
                             <Input
                                 type="textarea"
@@ -85,70 +97,23 @@ const Comment = ({ parentId = null, onSubmit, replyToUsername = null }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup style={{ display: "flex", flexDirection: "row-reverse" }}>
-                            {/* Image Upload Button */}
-                            <div className="file-input">
-                                <Label for="media" className="file-input-label">
-                                    <FaFileImage size={20} style={{ marginRight: "10px", backgroundColor: "green" }} />
-                                </Label>
-                                <Input
-                                    type="file"
-                                    name="media"
-                                    id="media"
-                                    onChange={handleMediaChange}
-                                    accept="image/*, video/*"
-                                    multiple
-                                    style={{ display: "none" }}
-                                />
-                            </div>
-
-                            {/* Camera Button */}
-                            <div className="file-input">
-                                <Label for="camera" className="file-input-label" onClick={handleCameraClick}>
-                                    <FaCamera size={20} style={{ marginRight: "10px", backgroundColor: "green" }} />
-                                </Label>
-                                <input
-                                    ref={cameraInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    capture="camera"
-                                    style={{ display: "none" }}
-                                    onChange={handleMediaChange}
-                                />
-                            </div>
-                        </FormGroup>
-
-                        <div className="media-preview">
-                            {media.map((mediaItem, index) => (
-                                <div key={index} className="media-item">
-                                    {mediaItem.file.type.includes("image") ? (
-                                        <img
-                                            src={mediaItem.preview}
-                                            alt={`Preview ${index}`}
-                                            className="img-fluid"
-                                        />
-                                    ) : mediaItem.file.type.includes("video") ? (
-                                        <video controls className="img-fluid">
-                                            <source src={mediaItem.preview} />
-                                        </video>
-                                    ) : null}
-                                    <button
-                                        type="button"
-                                        className="delete-btn"
-                                        onClick={() => handleDeleteMedia(index)}
-                                    >
-                                        &#10006;
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                        <MediaPreview media={media} handleDeleteMedia={handleDeleteMedia} />
 
                         {error && <Alert color="danger">{error}</Alert>}
                         {success && <Alert color="success">{success}</Alert>}
-                        <Button type="submit" color="primary">
-                            {parentId ? "Submit Reply" : "Submit Comment"}
-                        </Button>
+
+                        {loading ? (
+                            <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+                                <ClipLoader size={30} color={"#123abc"} />
+                            </div>
+                        ) : (
+                            <Button type="submit" color="primary">
+                                {parentId ? "Submit Reply" : "Submit Comment"}
+                            </Button>
+                        )}
                     </Form>
+
+
                 </Col>
             </Row>
         </Container>
