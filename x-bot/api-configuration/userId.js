@@ -1,9 +1,10 @@
-const axios = require('axios');
-const dotenv = require('dotenv');
+import dotenv from "dotenv";
+import axios from "axios";
+
 dotenv.config();
 
-async function getUserId(username) {
-    const bearerToken = process.env.X_BEARER_TOKEN;
+export async function getUserId(bearerToken, username) {
+    // const bearerToken = 'AAAAAAAAAAAAAAAAAAAAAGMHsQEAAAAA9ODDGMvFBIT6BKPExkFg8K1rhLk%3DxT0vtEdYK7zRridgqz2FWvSnBQ6KBuXFXhf4kTc22kuXqMY818';
 
     try {
         const response = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
@@ -18,6 +19,6 @@ async function getUserId(username) {
     }
 }
 
-getUserId('elonmusk').then(res => {
-    console.log(`Elon Musk's Twitter ID: ${res}`);
-});
+// getUserId('BenjaminCh54588').then(res => {
+//     console.log(`User Twitter ID: ${res}`);
+// });

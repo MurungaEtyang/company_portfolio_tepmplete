@@ -1,23 +1,26 @@
 const axios = require('axios');
 
-const BEARER_TOKEN = process.env.X_BEARER_TOKEN;
-
-async function likeTweet(userId, tweetId) {
+export async function likeTweet(bearerToken, userId, tweetId) {
     try {
         const response = await axios.post(
-            `https://api.twitter.com/2/users/${userId}/like`, {
-            tweet_id: tweetId
-        }, {
-            headers: {
-                "Authorization": `Bearer ${BEARER_TOKEN}`,
-                "Content-Type": "application/json"
+            `https://api.twitter.com/2/users/${userId}/likes`,
+            { tweet_id: tweetId },
+            {
+                headers: {
+                    "Authorization": `Bearer ${bearerToken}`,
+                    "Content-Type": "application/json",
+                    "User-Agent": "v2RecentSearchJS"
+                }
             }
-        });
+        );
 
         console.log("Tweet liked successfully:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("Error liking tweet:", error.response.data);
+        console.error("Error liking tweet:", error.response?.data || error.message);
+        throw error;
     }
 }
 
-likeTweet('1234567', "1234567890123456789");
+// Example usage (Replace with real values)
+// likeTweet('YOUR_BEARER_TOKEN', 'YOUR_USER_ID', 'TWEET_ID');

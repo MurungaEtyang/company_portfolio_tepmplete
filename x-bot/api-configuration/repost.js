@@ -1,24 +1,21 @@
-const axios = require('axios');
+import axios from "axios";
 
-
-
-async function repostTweet(userId, tweetId) {
+export async function repostTweet(bearer_token, userId, tweetId) {
     const API_URL = `https://api.twitter.com/2/users/${userId}/retweets`;
-    const BEARER_TOKEN = "YOUR_ACCESS_TOKEN";
     try {
         const response = await axios.post(API_URL, {
             tweet_id: tweetId
         }, {
             headers: {
-                "Authorization": `Bearer ${BEARER_TOKEN}`,
+                "Authorization": `Bearer ${bearer_token}`,
                 "Content-Type": "application/json"
             }
         });
 
         console.log("Tweet reposted successfully:", response.data);
+        return response.data;
     } catch (error) {
         console.error("Error reposting tweet:", error.response.data);
+        return null;
     }
 }
-
-repostTweet("1234556", "1234567890123456789");

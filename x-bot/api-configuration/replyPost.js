@@ -1,16 +1,18 @@
-const axios = require('axios');
+import axios from "axios";
+
 
 const API_URL = "https://api.twitter.com/2/tweets";
-const BEARER_TOKEN = process.env.X_BEARER_TOKEN;
 
-async function replyToTweet(tweetId, replyText) {
+export async function replyToTweet(bearerToken, tweetId, replyText) {
     try {
         const response = await axios.post(API_URL, {
             text: replyText,
-            reply: { in_reply_to_tweet_id: tweetId }
+            reply: {
+                in_reply_to_tweet_id: tweetId
+            }
         }, {
             headers: {
-                "Authorization": `Bearer ${BEARER_TOKEN}`,
+                Authorization: `Bearer ${bearerToken}`,
                 "User-Agent": "v2RecentSearchJS",
                 "Content-Type": "application/json"
             }
@@ -20,7 +22,6 @@ async function replyToTweet(tweetId, replyText) {
         return response.data;
     } catch (error) {
         console.error("Error posting reply:", error.response.data);
+        return null;
     }
 }
-
-replyToTweet("1234567890123456789", "This is my reply!");
