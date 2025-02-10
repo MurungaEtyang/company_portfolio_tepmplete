@@ -25,3 +25,10 @@ export async function replyToTweet(bearerToken, tweetId, replyText) {
         return null;
     }
 }
+//
+// const token = "b2RzM2xKU1ZxZXptZmt3NWZZUF9qZEdVVlFsekl2QWlCZlp6ci1qTE1JdVhTOjE3MzkwOTUxMTg1Nzk6MToxOmF0OjE"
+// const replyText = "yoh whats up victor";
+// const tweetId = "1888536918247215132";
+//
+
+// replyToTweet(token, tweetId, replyText);

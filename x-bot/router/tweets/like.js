@@ -1,30 +1,27 @@
 import express from "express";
-import { likeTweet } from "../../api-configuration/likePost.js";
+import { TwitterApi } from "twitter-api-v2";
 
 const router = express.Router();
 
-router.post('/kenf/v1/x-tweet-like/like', async (req, res) => {
-    const { bearer_token, user_id, tweet_id } = req.body;
-
-    if (!bearer_token || !user_id || !tweet_id) {
-        return res.status(400).json({ error: 'bearer token, user_id and tweet_id are required' });
-    }
-
+router.post("/kenf/v1/tweets/like", async (req, res) => {
     try {
-        const response = await likeTweet(bearer_token, user_id, tweet_id);
+        const { accessToken, tweetId, x_user_id } = req.body;
 
-        if (response === null) {
-            console.error('Error liking tweet:', 'No response from Twitter API');
-            return res.status(500).json({ error: 'Internal server error' });
+        if (!tweetId) {
+            return res.status(400).json({ error: "Tweet ID is required." });
         }
 
-        res.status(201).json({
-            message: 'Tweet liked successfully',
-            data: response
-        });
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized. Please log in first." });
+        }
+
+        const client = new TwitterApi(accessToken);
+        const response = await client.v2.like(x_user_id, tweetId);
+
+        res.json({ message: "Tweet liked successfully", response });
     } catch (error) {
-        console.error('Error liking tweet:', error);
-        return null;
+        console.error("Error liking tweet:", error);
+        res.status(500).json({ error: "Failed to like tweet" });
     }
 });
 

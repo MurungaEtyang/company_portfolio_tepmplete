@@ -20,9 +20,9 @@ const dbConfig = {
     maxConnections: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 20000,
-    ssl: {
-        ca: fs.readFileSync(process.env.CERTIFICATE_PATH || path.join(__dirname, 'ca.pem')).toString(),
-    },
+    // ssl: {
+    //     ca: fs.readFileSync(process.env.CERTIFICATE_PATH || path.join(__dirname, 'ca.pem')).toString(),
+    // },
 };
 
 const pool = new pg.Pool(dbConfig);

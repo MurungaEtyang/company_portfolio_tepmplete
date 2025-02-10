@@ -1,15 +1,14 @@
-const axios = require('axios');
+import axios from "axios";
 
 export async function likeTweet(bearerToken, userId, tweetId) {
     try {
         const response = await axios.post(
-            `https://api.twitter.com/2/users/${userId}/likes`,
+            `https://api.x.com/2/users/${userId}/likes`,
             { tweet_id: tweetId },
             {
                 headers: {
                     "Authorization": `Bearer ${bearerToken}`,
                     "Content-Type": "application/json",
-                    "User-Agent": "v2RecentSearchJS"
                 }
             }
         );
@@ -21,6 +20,9 @@ export async function likeTweet(bearerToken, userId, tweetId) {
         throw error;
     }
 }
-
-// Example usage (Replace with real values)
-// likeTweet('YOUR_BEARER_TOKEN', 'YOUR_USER_ID', 'TWEET_ID');
+// const token = "b2RzM2xKU1ZxZXptZmt3NWZZUF9qZEdVVlFsekl2QWlCZlp6ci1qTE1JdVhTOjE3MzkwOTUxMTg1Nzk6MToxOmF0OjE"
+//
+// const tweetId = "1888536918247215132";
+// const userId = "1888333090189107201";
+//
+// likeTweet(token, userId, tweetId);
