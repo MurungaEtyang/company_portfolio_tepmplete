@@ -47,7 +47,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Register routes
 app.use('/api', registerUsername);
 app.use('/api', addSecretsData);
 app.use('/api', addLatestTweetId);

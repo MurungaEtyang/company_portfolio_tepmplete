@@ -13,24 +13,23 @@ router.post('/kenf/v1/x-users/callback', async (req, res) => {
             return res.status(400).json({ error: "State, code, clientId, and clientSecret are required." });
         }
 
-        // Ensure session state matches
         if (!req.session || req.session.oauthState !== state) {
             return res.status(400).json({ error: "Invalid state" });
         }
 
         const codeVerifier = req.session.codeVerifier;
+        console.log(codeVerifier)
+
         if (!codeVerifier) {
             return res.status(400).json({ error: "Missing code_verifier. Restart login." });
         }
 
-        const client = new TwitterApi({ clientId, clientSecret });
+        const client = new TwitterApi({
+            clientId,
+            clientSecret,
+        });
 
-        // Exchange code for access token
-        const {
-            client: loggedClient,
-            accessToken,
-            refreshToken,
-        } = await client.loginWithOAuth2({
+        const { client: loggedClient, accessToken, refreshToken } = await client.loginWithOAuth2({
             code,
             codeVerifier,
             redirectUri: process.env.X_SET_CALLBACK_URL,
@@ -47,7 +46,6 @@ router.post('/kenf/v1/x-users/callback', async (req, res) => {
             clientId
         });
     } catch (error) {
-        console.error("OAuth Callback Error:", error);
 
         res.status(500).json({
             error: "Failed to authenticate with Twitter",

@@ -32,3 +32,21 @@ CREATE TABLE IF NOT EXISTS x_reply_tweets (
     reply_text VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS account_to_interact (
+    id SERIAL PRIMARY KEY,
+    account_username VARCHAR(255) NOT NULL,
+    linked_account_username VARCHAR(255) NOT NULL,
+    follow BOOLEAN NOT NULL DEFAULT FALSE,
+    likes BOOLEAN NOT NULL DEFAULT FALSE,
+    retweet BOOLEAN NOT NULL DEFAULT FALSE,
+    quote BOOLEAN NOT NULL DEFAULT FALSE,
+    comment_total INT NOT NULL DEFAULT 0 CHECK (comment_total >= 0),
+    comment_current INT NOT NULL DEFAULT 0 CHECK (comment_current >= 0),
+    trigger_comment BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_linked_account FOREIGN KEY (linked_account_username)
+    REFERENCES x_linked_account(username) ON DELETE CASCADE,
+    CONSTRAINT fk_account_username FOREIGN KEY (account_username)
+    REFERENCES x_username(username) ON DELETE CASCADE
+);
