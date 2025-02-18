@@ -26,9 +26,9 @@ export async function replyToTweet(bearerToken, tweetId, replyText) {
     }
 }
 //
-// const token = "b2RzM2xKU1ZxZXptZmt3NWZZUF9qZEdVVlFsekl2QWlCZlp6ci1qTE1JdVhTOjE3MzkwOTUxMTg1Nzk6MToxOmF0OjE"
-// const replyText = "yoh whats up victor";
-// const tweetId = "1888536918247215132";
+// const token = "Y3RFOXBNR0I5bmJ4MkI2TE1EeGVLZTZ2YjJkenFjX1FscU1kQ3h1akIydzFFOjE3MzkzNzYyNDMxMzI6MTowOmF0OjE"
+// const replyText = "please i need some solana here is my address jhrunoppfstgkhdgfiosnfydjkoldf";
+// const tweetId = "1889677388885234148";
 //
-
+//
 // replyToTweet(token, tweetId, replyText);

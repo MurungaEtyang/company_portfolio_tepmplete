@@ -33,6 +33,15 @@ CREATE TABLE IF NOT EXISTS x_reply_tweets (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS twitter_tokens (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 CREATE TABLE IF NOT EXISTS account_to_interact (
     id SERIAL PRIMARY KEY,
     account_username VARCHAR(255) NOT NULL,

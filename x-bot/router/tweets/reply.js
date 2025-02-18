@@ -12,17 +12,17 @@ router.post('/kenf/v1/x-reply-tweets/add', async (req, res) => {
     }
 
     try {
-        const selectTriggerQuery = `
-            SELECT trigger_comment
-            FROM account_to_interact
-        `;
-
-        const selectTriggerResult = await pool.query(selectTriggerQuery);
-        const trigger = selectTriggerResult.rows[0].trigger;
-
-        if (!trigger) {
-            return res.status(400).json({ error: 'Please allow comment' });
-        }
+        // const selectTriggerQuery = `
+        //     SELECT trigger_comment
+        //     FROM account_to_interact
+        // `;
+        //
+        // const selectTriggerResult = await pool.query(selectTriggerQuery);
+        // const trigger = selectTriggerResult.rows[0].trigger;
+        //
+        // if (!trigger) {
+        //     return res.status(400).json({ error: 'Please allow comment' });
+        // }
 
         const reply = await replyToTweet(bearer_token, tweet_id, reply_text);
 

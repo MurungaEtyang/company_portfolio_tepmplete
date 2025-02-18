@@ -19,6 +19,6 @@ export async function getUserId(bearerToken, username) {
     }
 }
 
-// getUserId('BenjaminCh54588').then(res => {
+// getUserId('AAAAAAAAAAAAAAAAAAAAAGMHsQEAAAAA9ODDGMvFBIT6BKPExkFg8K1rhLk%3DxT0vtEdYK7zRridgqz2FWvSnBQ6KBuXFXhf4kTc22kuXqMY818', 'Gladstonem23550').then(res => {
 //     console.log(`User Twitter ID: ${res}`);
 // });

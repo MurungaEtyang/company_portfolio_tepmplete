@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { TwitterApi } from "twitter-api-v2";
 export async function getLatestTweetId(bearerToken, username) {
     try {
         const response = await axios.get(`https://api.twitter.com/2/tweets/search/recent?query=from:${username}`, {
@@ -20,3 +20,5 @@ export async function getLatestTweetId(bearerToken, username) {
         return null;
     }
 }
+
+// await getLatestTweetId('1886856684871512064', 'AAAAAAAAAAAAAAAAAAAAAGMHsQEAAAAA9ODDGMvFBIT6BKPExkFg8K1rhLk%3DxT0vtEdYK7zRridgqz2FWvSnBQ6KBuXFXhf4kTc22kuXqMY818')
