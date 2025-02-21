@@ -37,12 +37,6 @@ router.post('/kenf/v1/allocations', authenticateJWT, async (req, res) => {
             return res.status(400).json({ error: 'Not enough stock available' });
         }
 
-        const [existingAllocation] = await pool.query('SELECT * FROM agrics_allocations WHERE project_id = ? AND input_id = ?', [project_id, input_id]);
-
-        if (existingAllocation.length > 0) {
-            return res.status(400).json({ error: 'Input has already been allocated for this project' });
-        }
-
         const query = `
             INSERT INTO agrics_allocations (project_id, input_id, quantity)
             VALUES (?, ?, ?)
@@ -72,12 +66,11 @@ router.post('/kenf/v1/allocations', authenticateJWT, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 router.get('/kenf/v1/user-allocations', authenticateJWT, async (req, res) => {
 
     try {
         const query = `
-            SELECT u.full_name, a.quantity
+            SELECT u.full_name, a.quantity, p.crop_type AS project_name
             FROM agrics_allocations a
             JOIN agrics_projects p ON a.project_id = p.id
             JOIN agrics_users u ON p.user_id = u.id
@@ -95,7 +88,6 @@ router.get('/kenf/v1/user-allocations', authenticateJWT, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 router.get('/kenf/v1/all-allocations', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Only admin can perform this action' });
