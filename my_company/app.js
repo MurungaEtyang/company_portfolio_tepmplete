@@ -11,6 +11,7 @@ import bookAppointment from "./routes/users/profile/bookAppointment.js";
 import users from "./routes/users/auth/users.js";
 import createProject from "./routes/users/project/createProject.js";
 import projectStatus from "./routes/users/project/projectStatus.js";
+import createPost from "./routes/posts/createPost.js";
 
 
 dotenv.config();
@@ -27,12 +28,12 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
-        } else {
-            console.error(`Blocked by CORS: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
-        }
+        // } else {
+        //     console.error(`Blocked by CORS: ${origin}`);
+        //     callback(new Error('Not allowed by CORS'));
+        // }
     },
     credentials: true,
 };
@@ -49,6 +50,8 @@ app.use("/api", bookAppointment)
 app.use("/api", users)
 app.use("/api", createProject)
 app.use("/api", projectStatus)
+app.use("/api", createPost)
+
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'http://localhost';

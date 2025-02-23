@@ -67,23 +67,41 @@ router.put('/kenf/nimrod/update-project/:projectId', authenticateJWT, async (req
     }
 });
 
-router.get('/kenf/nimrod/projects', async (req, res) => {
+
+router.put('/kenf/nimrod/update-project-status/:projectId', authenticateJWT, async (req, res) => {
     try {
+        const projectId = parseInt(req.params.projectId);
+        const { status } = req.body;
+        const userId = req.user.id;
+        const role = req.user.role;
+
+        if (role !== 'admin' && role !== 'mps') {
+            return res.status(403).json({ message: 'You are not authorized to update project status' });
+        }
+
+        if (!status) {
+            return res.status(400).json({ message: 'Status is required' });
+        }
 
         const result = await pool.query(
-            'SELECT * FROM projects WHERE visibility != $1 ORDER BY id DESC',
-            ['draft']
+            'UPDATE projects SET status = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+            [status, projectId, userId]
         );
 
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
         res.status(200).json({
-            message: 'Projects fetched successfully',
-            data: result.rows
+            message: 'Project status updated successfully',
+            data: result.rows[0]
         });
     } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('Error updating project status:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 router.put('/kenf/nimrod/update-visibility/:projectId', authenticateJWT, async (req, res) => {
     try {
@@ -118,6 +136,45 @@ router.put('/kenf/nimrod/update-visibility/:projectId', authenticateJWT, async (
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+router.get('/kenf/nimrod/projects', authenticateJWT, async (req, res) => {
+    try {
+
+        const result = await pool.query(
+            'SELECT * FROM projects WHERE visibility != $1 ORDER BY id DESC',
+            ['draft']
+        );
+
+        res.status(200).json({
+            message: 'Projects fetched successfully',
+            data: result.rows
+        });
+    } catch (error) {
+        console.error('Error fetching projects:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/kenf/nimrod/all-projects', authenticateJWT, async (req, res) => {
+    try {
+        const role = req.user.role;
+
+        if (role!== 'admin' && role!=='mps') {
+            return res.status(403).json({ message: 'You are not authorized to delete projects' });
+        }
+
+        const result = await pool.query('SELECT * FROM projects ORDER BY id DESC');
+
+        res.status(200).json({
+            message: 'All projects fetched successfully',
+            data: result.rows
+        });
+    } catch (error) {
+        console.error('Error fetching all projects:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 router.delete('/kenf/nimrod/delete-project/:projectId', authenticateJWT, async (req, res) => {
     try {

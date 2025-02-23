@@ -2,6 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import pool from "../../../config/config.js";
+import {authenticateJWT} from "../../../middleware/authenticateJwt.js";
 
 const router = express.Router();
 
@@ -9,21 +10,21 @@ router.post('/kenf/nimrod/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
+        return res.status(400).json({ message: 'Email and password are required' });
     }
 
     try {
         const result = await pool.query('SELECT * FROM nimrod_users WHERE email = $1', [email]);
 
         if (result.rows.length === 0) {
-            return res.status(400).json({ error: 'Invalid email or password' });
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         const user = result.rows[0];
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ error: 'Wrong password' });
+            return res.status(400).json({ message: 'Wrong password' });
         }
 
         const token = jwt.sign(
@@ -36,18 +37,18 @@ router.post('/kenf/nimrod/login', async (req, res) => {
                 role: user.role
             },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRATION || '1h' }
+            { expiresIn: process.env.JWT_EXPIRATION || '1y' }
         );
 
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful', lastName: user.last_name, email: user.email, token });
     } catch (error) {
         console.error('Error logging in user:', error);
-        res.status(500).json({ CONNECTION_ERROR: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-router.post('/kenf/nimrod/logout', (req, res) => {
-    res.clearCookie('token').sendStatus(200);
+router.post('/kenf/nimrod/logout', authenticateJWT, (req, res) => {
+    res.clearCookie('token').status(200).json({ message: 'Logout successful' });
 });
 
 

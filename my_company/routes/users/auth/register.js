@@ -28,7 +28,7 @@ router.post('/kenf/nimrod/register', async (req, res) => {
 
         const passwordStrengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordStrengthRegex.test(password)) {
-            return res.status(400).json({ error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character' });
+            return res.status(400).json({ message: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);

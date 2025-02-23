@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -10,6 +11,17 @@ console.log('Database Name:', process.env.DB_NAME);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const defaultData = {
+    firstName: process.env.DEFAULT_FIRST_NAME || 'Murunga',
+    lastName: process.env.DEFAULT_LAST_NAME || 'Evans',
+    email: process.env.DEFAULT_EMAIL || 'murungaevans845@gmail.com',
+    password: process.env.DEFAULT_PASSWORD || 'Evans1324$M',
+    ipAddress: process.env.DEFAULT_IP_ADDRESS || '',
+    location: process.env.DEFAULT_LOCATION || 'Nairobi',
+    isConfirmed: process.env.DEFAULT_IS_CONFIRMED || true,
+    role: process.env.DEFAULT_ROLE || 'admin',
+};
 
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
@@ -47,6 +59,27 @@ async function setupDatabase() {
 
         await pool.query(sql);
         console.log('Database setup install completed successfully.');
+
+        const result = await pool.query('SELECT * FROM nimrod_users WHERE email = $1', [defaultData.email]);
+
+        if (result.rows.length === 0) {
+            const hashedPassword = await bcrypt.hash(defaultData.password, 10);
+            const insertResult = await pool.query(
+                'INSERT INTO nimrod_users (first_name, last_name, email, password, registration_ip, location, is_confirmed, role) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+                [
+                    defaultData.firstName,
+                    defaultData.lastName,
+                    defaultData.email,
+                    hashedPassword,
+                    defaultData.ipAddress,
+                    defaultData.location,
+                    defaultData.isConfirmed,
+                    defaultData.role,
+                ]
+            );
+
+            console.log('Default data inserted into nimrod_users successfully.');
+        }
     } catch (err) {
         console.error('Error setting up the database:', err.message);
         console.error('Error Stack:', err.stack);

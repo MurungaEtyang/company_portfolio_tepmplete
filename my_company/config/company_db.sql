@@ -5,6 +5,12 @@ DROP TRIGGER IF EXISTS set_nimrod_user_role_permissions_timestamp ON nimrod_user
 DROP TRIGGER IF EXISTS set_projects_timestamp ON projects;
 DROP TRIGGER IF EXISTS set_project_statuses_timestamp ON project_statuses;
 DROP INDEX IF EXISTS idx_projects_user_id;
+DROP INDEX IF EXISTS idx_book_appointments_user_id;
+DROP INDEX IF EXISTS idx_projects_status_id;
+DROP TRIGGER IF EXISTS set_posts_timestamp ON posts;
+DROP TRIGGER IF EXISTS set_post_replies_timestamp ON post_replies;
+DROP INDEX IF EXISTS idx_posts_user_id;
+DROP INDEX IF EXISTS idx_post_replies_post_id;
 
 CREATE OR REPLACE FUNCTION update_timestamp_column()
     RETURNS TRIGGER AS $$
@@ -29,6 +35,11 @@ CREATE TABLE IF NOT EXISTS nimrod_users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO nimrod_users (first_name, last_name, email, role, password, location, is_confirmed)
+VALUES ('Murunga', 'Evans', 'murunga84@gmail.com', 'admin', '$2b$12$M7LQ4y3QF5h/jxWUW7WZVOhZ4XyZo/0Q8hZwZ7XyZo/0Q8hZwZ7XyZo/0Q8hZwZ7XyZo/0Q8hZw', 'Nairobi', TRUE)
+ON CONFLICT (email) DO NOTHING;
+
 
 CREATE TRIGGER set_nimrod_users_timestamp
     BEFORE UPDATE ON nimrod_users
@@ -105,9 +116,6 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO statuses (status)
-VALUES ('planned'), ('in-progress'), ('completed'), ('publish'), ('draft')
-ON CONFLICT (status) DO NOTHING;
 
 
 CREATE TABLE IF NOT EXISTS statuses (
@@ -126,11 +134,42 @@ ON CONFLICT (status) DO NOTHING;
 CREATE TABLE IF NOT EXISTS project_statuses (
     id SERIAL PRIMARY KEY,
     project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
-    status_id INTEGER REFERENCES statuses(id) ON DELETE CASCADE DEFAULT (SELECT id FROM statuses WHERE status = 'in-progress'),
+    status_id INTEGER REFERENCES statuses(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (project_id, status_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    post_message TEXT NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    user_id INTEGER REFERENCES nimrod_users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS post_replies (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    post_reply_message TEXT NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    user_id INTEGER REFERENCES nimrod_users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER set_posts_timestamp
+    BEFORE UPDATE ON posts
+    FOR EACH ROW
+EXECUTE FUNCTION update_timestamp_column();
 
 CREATE TRIGGER set_projects_timestamp
     BEFORE UPDATE ON projects
