@@ -81,7 +81,7 @@ router.put('/kenf/nimrod/regenerate/:email', async (req, res) => {
         await sendEmail(email, subject, emailContent);
 
         res.status(200).json({
-            message: 'Confirmation code regenerated successfully. Please check your email.',
+            message: `Confirmation code regenerated successfully. Please check your email (${email}) for the new code.`,
         });
     } catch (error) {
         console.error('Error regenerating confirmation code:', error);

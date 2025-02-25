@@ -18,6 +18,7 @@ export const logout = async () => {
             localStorage.removeItem("last_name");
             localStorage.removeItem("admin_token");
             localStorage.removeItem("admin_email");
+            localStorage.removeItem("role");
             // localStorage.clear();
 
             return {

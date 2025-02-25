@@ -14,7 +14,8 @@ const response = await fetch(`${apiUrl.baseUrl}/api/kenf/nimrod/login`, {
             message: data.message,
             lastName: data.lastName,
             user_email: data.email,
-            token: data.token
+            token: data.token,
+            role: data.role
         };
     } else {
         throw new Error(data.message);

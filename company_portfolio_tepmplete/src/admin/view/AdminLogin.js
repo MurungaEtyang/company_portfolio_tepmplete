@@ -14,14 +14,19 @@ const AdminLogin = ({ onClose = () => {} }) => {
         if (email && password) {
             setLoading(true);
             try {
-                const { message: loginMessage, lastName, user_email, token } = await login(email, password);
+                const { message: loginMessage, lastName, user_email, token, role } = await login(email, password);
                 setMessage(loginMessage);
                 if (token) {
                     localStorage.setItem("last_name", lastName);
                     localStorage.setItem("admin_email", user_email);
                     localStorage.setItem("admin_token", token);
+                    localStorage.setItem("role", role);
                     onClose();
-                    navigate("/admin");
+                    if (role === "user") {
+                        navigate("/");
+                    } else {
+                        navigate("/admin");
+                    }
                     window.location.reload();
                 }
             } catch (error) {

@@ -9,6 +9,11 @@ const AdminDashboard = () => {
     const email = localStorage.getItem("admin_email");
     const token = localStorage.getItem("admin_token");
     const [activeSection, setActiveSection] = useState(token ? "dashboard" : null);
+    const role = localStorage.getItem('role');
+
+    if (role === "user") {
+        adminLogout().then(() => window.location.href = "/");
+    }
 
     const handleLogout = async () => {
         const logoutResponse = window.confirm("Are you sure you want to log out?");
@@ -57,6 +62,14 @@ const AdminDashboard = () => {
                                 className={`w-full text-left ${activeSection === "projects" ? "text-green-400" : "hover:text-green-400"}`}
                             >
                                 Projects
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={() => window.location.href = "/"}
+                                className="w-full text-left hover:text-green-400"
+                            >
+                                View Client Side
                             </button>
                         </li>
                         <li>

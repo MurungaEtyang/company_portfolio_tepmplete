@@ -40,7 +40,7 @@ router.post('/kenf/nimrod/login', async (req, res) => {
             { expiresIn: process.env.JWT_EXPIRATION || '1y' }
         );
 
-        res.status(200).json({ message: 'Login successful', lastName: user.last_name, email: user.email, token });
+        res.status(200).json({ message: 'Login successful', lastName: user.last_name, role: user.role, email: user.email, token });
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ message: 'Internal server error' });

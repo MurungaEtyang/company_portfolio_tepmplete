@@ -166,6 +166,43 @@ CREATE TABLE IF NOT EXISTS post_replies (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS twitter_username (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    user_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS twitter_accounts (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    bearer_token VARCHAR(255) NOT NULL UNIQUE,
+    api_key VARCHAR(255) NOT NULL,
+    api_key_secret VARCHAR(255) NOT NULL,
+    access_token VARCHAR(255) NOT NULL,
+    access_token_secret VARCHAR(255) NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL,
+    client_id VARCHAR(255) NOT NULL,
+    client_secret VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE IF NOT EXISTS twitter_tokens (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO twitter_tokens (username, access_token, refresh_token)
+VALUES ('_ivan1290', 'SzBhUlZRVXBNZ1BYYmlPaXliSzVOc1FtN2UwZHF4NVMya1RLZndZVzJON1RzOjE3NDA0NzMyNDU4MTQ6MTowOmF0OjE', 'a055aWV1NV9jRmU4TVZ2WTBXWnpIVlIyUEV2MW5NZmowV0xQVjE5YUJ6eGd4OjE3NDA0NzMyNDU4MTQ6MTowOnJ0OjE')
+ON CONFLICT (username) DO NOTHING;
+
+
 CREATE TRIGGER set_posts_timestamp
     BEFORE UPDATE ON posts
     FOR EACH ROW

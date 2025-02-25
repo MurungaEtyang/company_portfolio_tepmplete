@@ -12,6 +12,9 @@ import users from "./routes/users/auth/users.js";
 import createProject from "./routes/users/project/createProject.js";
 import projectStatus from "./routes/users/project/projectStatus.js";
 import createPost from "./routes/posts/createPost.js";
+import registerTwitterUsername from "./routes/socials/twitter/registerTwitterUsername.js";
+import twitter from "./routes/socials/twitter/Twitter.js";
+import UpdateProjectVisibilty from "./routes/users/project/updateProjectVisibilty.js";
 
 
 dotenv.config();
@@ -51,6 +54,9 @@ app.use("/api", users)
 app.use("/api", createProject)
 app.use("/api", projectStatus)
 app.use("/api", createPost)
+app.use("/api", registerTwitterUsername)
+app.use("/api", twitter)
+app.use("/api", UpdateProjectVisibilty)
 
 
 const PORT = process.env.PORT || 3000;

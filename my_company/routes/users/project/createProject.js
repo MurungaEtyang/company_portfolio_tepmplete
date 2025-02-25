@@ -1,6 +1,7 @@
 import pool from "../../../config/config.js";
 import {authenticateJWT} from "../../../middleware/authenticateJwt.js";
 import express from 'express';
+import TwitterService from "../../../utils/social-media/postTwieet.js";
 
 const router = express.Router();
 
@@ -103,39 +104,7 @@ router.put('/kenf/nimrod/update-project-status/:projectId', authenticateJWT, asy
 });
 
 
-router.put('/kenf/nimrod/update-visibility/:projectId', authenticateJWT, async (req, res) => {
-    try {
-        const projectId = parseInt(req.params.projectId);
-        const userId = req.user.id;
-        const role = req.user.role;
-        const { visibility } = req.body;
 
-        if (role!== 'admin' && role!=='mps') {
-            return res.status(403).json({ message: 'You are not authorized to update project visibility' });
-        }
-
-        if (!visibility) {
-            return res.status(400).json({ message: 'Visibility is required' });
-        }
-
-        const result = await pool.query(
-            'UPDATE projects SET visibility = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
-            [visibility, projectId, userId]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        res.status(200).json({
-            message: 'Project visibility updated successfully',
-            data: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Error updating project visibility:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
 
 router.get('/kenf/nimrod/projects', authenticateJWT, async (req, res) => {
     try {
