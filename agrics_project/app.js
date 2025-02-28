@@ -10,6 +10,11 @@ import {initializeDatabase} from "./config/config.js";
 import agrics_project from "./routes/project/agrics_project.js";
 import agrics_inputs from "./routes/project/agrics_inputs.js";
 import allocation_product from "./routes/project/allocation_product.js";
+import users from "./routes/users/users.js";
+import upgradeUser from "./routes/users/upgradeUser.js";
+import allocationProjectQuantity from "./routes/project/allocationProjectQuantity.js";
+import modeOfPayment from "./routes/payment/modeOfPayment.js";
+// import payment from "./routes/payment/payment.js";
 
 const app = express();
 app.use(helmet());
@@ -43,6 +48,11 @@ app.use('/api', login_users);
 app.use('/api', agrics_project);
 app.use('/api', agrics_inputs);
 app.use('/api', allocation_product);
+app.use('/api', users);
+app.use('/api', upgradeUser);
+app.use('/api', allocationProjectQuantity);
+app.use('/api', modeOfPayment);
+// app.use('/api', payment);
 
 
 const PORT = process.env.PORT || 3000;

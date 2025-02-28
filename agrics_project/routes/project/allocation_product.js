@@ -38,7 +38,7 @@ router.post('/kenf/v1/allocations', authenticateJWT, async (req, res) => {
         }
 
         const query = `
-            INSERT INTO agrics_allocations (project_id, input_id, quantity)
+            INSERT INTO agrics_project_inputs (project_id, input_id, quantity)
             VALUES (?, ?, ?)
         `;
         await pool.query(query, [project_id, input_id, quantity]);
@@ -70,9 +70,9 @@ router.get('/kenf/v1/user-allocations', authenticateJWT, async (req, res) => {
 
     try {
         const query = `
-            SELECT u.full_name, a.quantity, p.crop_type AS project_name
-            FROM agrics_allocations a
-            JOIN agrics_projects p ON a.project_id = p.id
+            SELECT u.full_name, api.quantity, p.crop_type AS project_name
+            FROM agrics_project_inputs api
+            JOIN agrics_projects p ON api.project_id = p.id
             JOIN agrics_users u ON p.user_id = u.id
             WHERE u.id = ?
         `;
@@ -89,15 +89,15 @@ router.get('/kenf/v1/user-allocations', authenticateJWT, async (req, res) => {
     }
 });
 router.get('/kenf/v1/all-allocations', authenticateJWT, async (req, res) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ error: 'Only admin can perform this action' });
+    if (req.user.role !== 'admin' && req.user.role !== 'secretary') {
+        return res.status(403).json({ error: 'Only admin and secretary can perform this action' });
     }
 
     try {
         const query = `
-            SELECT u.full_name, a.quantity, p.crop_type AS project_name
-            FROM agrics_allocations a
-            JOIN agrics_projects p ON a.project_id = p.id
+            SELECT u.full_name, api.quantity, p.crop_type AS project_name, p.id AS project_id
+            FROM agrics_project_inputs api
+            JOIN agrics_projects p ON api.project_id = p.id
             JOIN agrics_users u ON p.user_id = u.id
         `;
         const [allocations] = await pool.query(query);

@@ -2,6 +2,7 @@ import { useState } from "react";
 import AdminLogin from "./AdminLogin";
 import { adminLogout } from "../admin-service/AdminLogOut";
 import CreateProject from "./CreatePrtoject";
+import Socials from "./socials/twitter/Socials";
 
 const AdminDashboard = () => {
 
@@ -50,10 +51,10 @@ const AdminDashboard = () => {
                         </li>
                         <li>
                             <button
-                                onClick={() => setActiveSection("appointments")}
-                                className={`w-full text-left ${activeSection === "appointments" ? "text-green-400" : "hover:text-green-400"}`}
+                                onClick={() => setActiveSection("socials")}
+                                className={`w-full text-left ${activeSection === "socials" ? "text-green-400" : "hover:text-green-400"}`}
                             >
-                                Appointments
+                                Socials
                             </button>
                         </li>
                         <li>
@@ -92,9 +93,9 @@ const AdminDashboard = () => {
                         <p className="text-gray-300 mt-2">Email: {email}</p>
                     </div>
                 )}
-                {activeSection === "appointments" && (
+                {activeSection === "socials" && (
                     <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h2 className="text-3xl font-bold text-green-400">Appointments</h2>
+                        <Socials/>
                     </div>
                 )}
                 {activeSection === "projects" && (

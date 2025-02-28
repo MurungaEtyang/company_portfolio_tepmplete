@@ -5,9 +5,9 @@ import { authenticateJWT } from "../../middleware/authenticateJwt.js";
 const router = express.Router();
 
 router.post('/kenf/v1/projects', authenticateJWT, async (req, res) => {
-    const { crop_type, expected_yield, land_size, location, land_size_unit, expected_yield_unit } = req.body;
+    const { project_name, crop_type, expected_yield, land_size, location, land_size_unit, expected_yield_unit } = req.body;
 
-    if (!crop_type || !expected_yield || !land_size || !location) {
+    if (!project_name || !crop_type || !expected_yield || !land_size || !location) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -16,10 +16,10 @@ router.post('/kenf/v1/projects', authenticateJWT, async (req, res) => {
 
     try {
         const query = `
-            INSERT INTO agrics_projects (user_id, crop_type, expected_yield, expected_yield_unit, land_size, land_size_unit, location)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO agrics_projects (user_id, project_name, crop_type, expected_yield, expected_yield_unit, land_size, land_size_unit, location)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await pool.query(query, [req.user.id, crop_type, expected_yield, expectedYieldUnit, land_size, landSizeUnit, location]);
+        await pool.query(query, [req.user.id, project_name, crop_type, expected_yield, expectedYieldUnit, land_size, landSizeUnit, location]);
         res.status(201).json({ message: 'Project created successfully' });
     } catch (error) {
         console.error('Error creating project:', error);

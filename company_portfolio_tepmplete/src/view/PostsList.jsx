@@ -20,6 +20,17 @@ const PostsList = () => {
         };
 
         fetchPosts();
+
+        const interval = setInterval(async () => {
+            try {
+                const { data } = await getPosts();
+                setPosts(data);
+            } catch (error) {
+                setError("Failed to fetch posts. Please try again later.");
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleReplyChange = (postId, value) => {

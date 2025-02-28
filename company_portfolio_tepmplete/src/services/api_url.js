@@ -1,5 +1,5 @@
 
-const api_url = "http://localhost:5000";
+const api_url = "https://gok.kbhacksandsolutions.com";
 
 export const apiUrl = {
     baseUrl : api_url

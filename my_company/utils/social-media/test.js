@@ -1,6 +1,6 @@
 import {TwitterApi} from "twitter-api-v2";
 
-const client = new TwitterApi("RVg5OUlMWGtySi1DNk5ha29EV3NfcE80TlpLdHRXUDdycl9wODF6QUhUOVdEOjE3NDA0MjQwNDAwNTM6MToxOmF0OjE");
+const client = new TwitterApi("WHFkWUoySHZYMmQxdUFGa0hHV24tMS1sNWZESWtPUHJOR2dENHNoeTJiT0M1OjE3NDA0OTAxNzAwMzA6MToxOmF0OjE");
 
 
 const rwClient = client.readWrite;

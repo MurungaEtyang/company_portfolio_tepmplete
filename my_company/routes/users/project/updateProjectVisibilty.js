@@ -39,7 +39,7 @@ router.put('/kenf/nimrod/update-visibility/:projectId', authenticateJWT, async (
             if (accounts.rows.length > 0) {
                 for (const account of accounts.rows) {
                     try {
-                        const twitter = new TwitterService(account.username);
+                        const twitter = new TwitterService();
                         await twitter.sendTweetToAll(message);
                         console.log(`✅ Announcement posted on Twitter for @${account.username}`);
                     } catch (error) {

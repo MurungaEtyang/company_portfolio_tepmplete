@@ -19,6 +19,10 @@ router.post('/kenf/nimrod/create-project', authenticateJWT, async (req, res) => 
             return res.status(400).json({ message: 'All fields are required' });
         }
 
+        if (description.length > 200) {
+            return res.status(400).json({ message: 'Description should be less than 200 words' });
+        }
+
         const result = await pool.query(
             'INSERT INTO projects (user_id, title, description, budget, deadline) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [userId, title, description, budget, deadline]
@@ -33,7 +37,6 @@ router.post('/kenf/nimrod/create-project', authenticateJWT, async (req, res) => 
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 router.put('/kenf/nimrod/update-project/:projectId', authenticateJWT, async (req, res) => {
     try {
         const projectId = parseInt(req.params.projectId);

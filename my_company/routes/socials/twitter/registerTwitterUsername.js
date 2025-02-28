@@ -10,14 +10,14 @@ router.post('/kenf/nimrod/x-username/get-user-id', authenticateJWT, async (req, 
     const { bearerToken, username } = req.body;
 
     if (!bearerToken || !username) {
-        return res.status(400).json({ error: 'Both bearer token and username are required' });
+        return res.status(400).json({ message: 'Both bearer token and username are required' });
     }
 
     try {
         const { userId } = await getUserId(bearerToken, username);
 
         if (!userId) {
-            return res.status(404).json({ error: 'User not found on Twitter' });
+            return res.status(404).json({ message: 'User not found on Twitter' });
         }
 
         const insertQuery = `
@@ -36,7 +36,7 @@ router.post('/kenf/nimrod/x-username/get-user-id', authenticateJWT, async (req, 
         });
     } catch (error) {
         console.error('Error registering:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -50,7 +50,7 @@ router.get('/kenf/v1/x-username/get',  authenticateJWT, async (req, res) => {
         const selectResult = await pool.query(selectQuery);
 
         if (selectResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No data found' });
+            return res.status(404).json({ message: 'No data found' });
         }
 
         res.status(200).json({
@@ -59,9 +59,41 @@ router.get('/kenf/v1/x-username/get',  authenticateJWT, async (req, res) => {
         });
     } catch (error) {
         console.error('Error retrieving data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+router.post('/kenf/nimrod/x-tokens/add-access-token', async (req, res) => {
+    const {
+        username,
+        access_token,
+        refresh_token
+    } = req.body;
+
+    if (!username || !access_token || !refresh_token) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    try {
+        const insertQuery = `
+            INSERT INTO twitter_tokens (username, access_token, refresh_token)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (username) DO UPDATE
+            SET access_token = $2, refresh_token = $3
+            RETURNING id, username, access_token, refresh_token, created_at
+        `;
+
+        const insertResult = await pool.query(insertQuery, [username, access_token, refresh_token]);
+
+        res.status(201).json({
+            message: 'You have been registered successfully',
+            data: insertResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error registering:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+})
 
 router.get('/kenf/v1/x-tokens/get', authenticateJWT, async (req, res) => {
     try {
@@ -73,7 +105,7 @@ router.get('/kenf/v1/x-tokens/get', authenticateJWT, async (req, res) => {
         const selectResult = await pool.query(selectQuery);
 
         if (selectResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No data found' });
+            return res.status(404).json({message: 'No data found' });
         }
 
         res.status(200).json({
@@ -82,7 +114,7 @@ router.get('/kenf/v1/x-tokens/get', authenticateJWT, async (req, res) => {
         });
     } catch (error) {
         console.error('Error retrieving data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ messaage: 'Internal server error' });
     }
 });
 
@@ -96,7 +128,7 @@ router.delete('/kenf/v1/x-tokens/delete', authenticateJWT, async (req, res) => {
         const deleteResult = await pool.query(deleteQuery);
 
         if (deleteResult.rowCount === 0) {
-            return res.status(404).json({ error: 'Data not found' });
+            return res.status(404).json({ message: 'Data not found' });
         }
 
         res.status(200).json({
@@ -104,7 +136,7 @@ router.delete('/kenf/v1/x-tokens/delete', authenticateJWT, async (req, res) => {
         });
     } catch (error) {
         console.error('Error deleting data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 export default router;

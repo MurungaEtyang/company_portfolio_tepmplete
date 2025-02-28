@@ -11,6 +11,7 @@ const CreateProject = () => {
     const [visibility, setVisibility] = useState("draft");
     const [status, setStatus] = useState("in-progress");
     const [projectId, setProjectId] = useState(null);
+    const [postMessages, setPostMessages] = useState("");
 
     useEffect(() => {
         const storedId = localStorage.getItem("projectId");
@@ -34,7 +35,7 @@ const CreateProject = () => {
                 const { postMessage, id } = data;
                 localStorage.setItem("projectId", id);
                 setProjectId(id);
-                alert(postMessage);
+                setPostMessages(postMessage);
             })
             .catch((error) => {
                 console.error(error);
@@ -147,6 +148,8 @@ const CreateProject = () => {
                     />
                 </div>
 
+                <p className="text-green-500 text-sm mb-2">{postMessages}</p>
+
                 <div className="relative h-96">
                     <label className="block text-lg font-medium">Description</label>
                     <ReactQuill
@@ -175,6 +178,7 @@ const CreateProject = () => {
                         className="bg-white text-black rounded-md h-full text-lg z-0"
                     />
                 </div>
+
 
                 <button
                     type="submit"

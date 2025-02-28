@@ -64,7 +64,7 @@ router.post('/kenf/nimrod/x-bearer-token/add', authenticateJWT, async (req, res)
     }
 });
 
-router.get('/kenf/v1/x-bearer-token/get', authenticateJWT,  async (req, res) => {
+router.get('/kenf/v1/x-bearer-token/get',  async (req, res) => {
     try {
         const selectQuery = `
             SELECT 
@@ -84,7 +84,7 @@ router.get('/kenf/v1/x-bearer-token/get', authenticateJWT,  async (req, res) => 
         const selectResult = await pool.query(selectQuery);
 
         if (selectResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No data found' });
+            return res.status(404).json({ message: 'No data found' });
         }
 
         res.status(200).json({
@@ -93,7 +93,7 @@ router.get('/kenf/v1/x-bearer-token/get', authenticateJWT,  async (req, res) => 
         });
     } catch (error) {
         console.error('Error retrieving data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

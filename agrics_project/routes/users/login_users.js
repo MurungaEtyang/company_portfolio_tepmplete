@@ -22,6 +22,9 @@ router.post('/kenf/v1/login/users', async (req, res) => {
 
         const user = rows[0];
 
+        const [ role_name ] = await pool.query('SELECT role_name FROM agrics_roles WHERE id = ?', [user.role_id]);
+        user.role = role_name[0].role_name;
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Wrong password' });
