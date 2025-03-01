@@ -53,6 +53,8 @@ router.get('/kenf/v1/quantity-allocations', authenticateJWT, async (req, res) =>
         `;
         const [allocations] = await pool.query(query);
 
+        console.log([allocations])
+
         res.status(200).json(allocations);
     } catch (error) {
         console.error('Error fetching allocations:', error);
