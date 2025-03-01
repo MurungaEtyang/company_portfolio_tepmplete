@@ -1,63 +1,106 @@
 import express from "express";
 import axios from "axios";
-import ngrok from "ngrok";
-import dotenv from "dotenv";
+import { pool } from "../../config/config.js";
 
-dotenv.config();
 const router = express.Router();
 
-let ngrokUrl = "";
-
-const setupNgrok = async () => {
-    ngrokUrl = await ngrok.connect({ proto: "http", addr: process.env.PORT || 3000 });
-    console.log(`🔗 Ngrok URL: ${ngrokUrl}`);
+const getToken = async () => {
+    try {
+        const auth = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
+        const { data } = await axios.get(
+            "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+            { headers: { Authorization: `Basic ${auth}` } }
+        );
+        return data.access_token;
+    } catch (error) {
+        throw new Error("Failed to get Safaricom token");
+    }
 };
 
-// Run Ngrok when the app starts
-setupNgrok();
-
-const getToken = async () => {
-    const auth = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
-    const { data } = await axios.get("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-        headers: { Authorization: `Basic ${auth}` }
-    });
-    return data.access_token;
+const getNgrokUrlFromDB = async () => {
+    try {
+        const [result] = await pool.query("SELECT url FROM ngrok_urls ORDER BY created_at DESC LIMIT 1");
+        return result.length ? result[0].url : null;
+    } catch (error) {
+        throw new Error("Failed to fetch Ngrok URL");
+    }
 };
 
 router.post("/send-money", async (req, res) => {
     try {
+        const { user_id, phone, amount } = req.body;
+
+        if (!user_id || !phone || !amount) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
         const token = await getToken();
-        const response = await axios.post(
+        const ngrokUrl = await getNgrokUrlFromDB();
+        console.log(ngrokUrl)
+
+        if (!ngrokUrl) return res.status(500).json({ error: "Ngrok URL is not available" });
+
+        const { data: mpesaResponse } = await axios.post(
             "https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest",
             {
                 InitiatorName: process.env.INITIATOR_NAME,
                 SecurityCredential: process.env.SECURITY_CREDENTIAL,
                 CommandID: "BusinessPayment",
-                Amount: req.body.amount || 100,  // Get amount from request body
+                Amount: amount,
                 PartyA: process.env.SHORTCODE,
-                PartyB: req.body.phone || process.env.TEST_PHONE,  // Get phone from request
-                Remarks: "Test Payment",
-                QueueTimeOutURL: `${ngrokUrl}/api/mpesa/timeout`,
-                ResultURL: `${ngrokUrl}/api/mpesa/result`,
-                Occasion: "Test"
+                PartyB: phone,
+                Remarks: "Payment to Customer",
+                QueueTimeOutURL: `${ngrokUrl}/send-money`,
+                ResultURL: `${ngrokUrl}/send-money`,
+                Occasion: "Agrics Payout"
             },
             { headers: { Authorization: `Bearer ${token}` } }
         );
-        res.json(response.data);
+
+        console.log("M-Pesa API Response:", mpesaResponse);
+        const transactionID = mpesaResponse.ConversationID;
+
+        await pool.query(
+            "INSERT INTO agrics_payments (user_id, amount, mpesa_receipt_number, mpesa_transaction_id, mpesa_phone_number, is_paid, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [user_id, amount, transactionID, transactionID, phone, false, new Date()]
+        );
+
+        const result = await new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    ResultType: 0,
+                    ResultCode: 0,
+                    ResultDesc: "The service request is processed successfully.",
+                    TransactionID: "LKXXXX1234",
+                    Amount: amount
+                });
+            }, 3000);
+        });
+
+        console.log("M-Pesa Transaction Completed:", result);
+
+        const isPaid = result.ResultCode === 0;
+
+        await pool.query(
+            "UPDATE agrics_payments SET is_paid = ?, paid_at = ? WHERE mpesa_transaction_id = ? AND user_id = ?",
+            [isPaid, new Date(), transactionID, user_id]
+        );
+
+        return res.json({ success: true, mpesaResponse, result });
+
     } catch (error) {
-        res.status(500).json(error.response?.data || { error: "Request failed" });
+        console.error("Error:", error.message);
+        return res.status(500).json({ error: error.message || "Internal Server Error" });
+
     }
 });
 
-// Handle Mpesa Result & Timeout Callbacks
-router.post("/result", (req, res) => {
-    console.log("📩 MPesa Result:", req.body);
-    res.status(200).send("Result received");
-});
+//
+// curl -X POST http://localhost:5000/api/send-money      -H "Content-Type: application/json"      -d '{
+//     "user_id": 1,
+//     "phone": "254708374149",
+//     "amount": 100
+// }'
 
-router.post("/timeout", (req, res) => {
-    console.log("⏳ MPesa Timeout:", req.body);
-    res.status(200).send("Timeout received");
-});
 
 export default router;

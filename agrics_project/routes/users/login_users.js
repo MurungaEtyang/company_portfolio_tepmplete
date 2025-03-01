@@ -38,7 +38,7 @@ router.post('/kenf/v1/login/users', async (req, res) => {
                 role: user.role
             },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRATION || '1h' }
+            { expiresIn: process.env.JWT_EXPIRATION || '1y' }
         );
 
         res.status(200).json({ message: 'Login successful', token });

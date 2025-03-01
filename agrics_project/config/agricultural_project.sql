@@ -69,6 +69,24 @@ CREATE TABLE IF NOT EXISTS agrics_payment_modes (
 # VALUES (?, ?, ?)
 # ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
 
+CREATE TABLE IF NOT EXISTS ngrok_urls (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS agrics_payments (
+   id INT PRIMARY KEY AUTO_INCREMENT,
+   user_id INT NOT NULL,
+   amount INT NOT NULL,
+   mpesa_receipt_number VARCHAR(255) NOT NULL,
+   mpesa_transaction_id VARCHAR(255) NOT NULL,
+   mpesa_phone_number VARCHAR(20) NOT NULL,
+   is_paid BOOLEAN DEFAULT FALSE,
+   paid_at TIMESTAMP,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES agrics_users(id) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS agrics_allocations (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -79,34 +97,22 @@ CREATE TABLE IF NOT EXISTS agrics_allocations (
     FOREIGN KEY (project_id) REFERENCES agrics_projects(id) ON DELETE CASCADE
 );
 
+
 UPDATE agrics_allocations
 SET price = quantity * 10;
 
+DROP TRIGGER IF EXISTS set_price_before_insert;
 CREATE TRIGGER set_price_before_insert
     BEFORE INSERT ON agrics_allocations
     FOR EACH ROW
     SET NEW.price = NEW.quantity * 10;
 
+DROP TRIGGER IF EXISTS get_user_id_on_insert;
 CREATE TRIGGER get_user_id_on_insert
 BEFORE INSERT ON agrics_allocations
 FOR EACH ROW
 SET NEW.user_id = (SELECT user_id FROM agrics_projects WHERE id = NEW.project_id);
 
-
-CREATE TABLE IF NOT EXISTS agrics_payments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    agrics_allocations_id INT NOT NULL,
-    user_id INT NOT NULL,
-    amount INT NOT NULL,
-    mpesa_receipt_number VARCHAR(255) NOT NULL,
-    mpesa_transaction_id VARCHAR(255) NOT NULL,
-    mpesa_phone_number VARCHAR(20) NOT NULL,
-    is_paid BOOLEAN DEFAULT FALSE,
-    paid_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (agrics_allocations_id) REFERENCES agrics_allocations(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES agrics_users(id) ON DELETE CASCADE
-);
 
 
 CREATE TABLE IF NOT EXISTS agrics_allocations_backup (

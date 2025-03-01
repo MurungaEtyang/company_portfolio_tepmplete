@@ -16,6 +16,7 @@ router.post('/kenf/v1/payment-modes', authenticateJWT, async (req, res) => {
         const query = `
             INSERT INTO agrics_payment_modes (user_id, payment_method, details)
             VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE details = VALUES(details)
         `;
         await pool.query(query, [user_id, payment_method, details]);
         res.status(201).json({ message: 'Payment mode added successfully' });

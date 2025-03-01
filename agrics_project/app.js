@@ -14,7 +14,8 @@ import users from "./routes/users/users.js";
 import upgradeUser from "./routes/users/upgradeUser.js";
 import allocationProjectQuantity from "./routes/project/allocationProjectQuantity.js";
 import modeOfPayment from "./routes/payment/modeOfPayment.js";
-// import payment from "./routes/payment/payment.js";
+import payment from "./routes/payment/payment.js";
+import ngrok from "./routes/payment/ngrok.js";
 
 const app = express();
 app.use(helmet());
@@ -31,7 +32,7 @@ const allowedOrigins = [
 const corsOptions = {
     origin: (origin, callback) => {
         // if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
+        callback(null, true);
         // } else {
         //     console.error(`Blocked by CORS: ${origin}`);
         //     callback(new Error('Not allowed by CORS'));
@@ -52,17 +53,17 @@ app.use('/api', users);
 app.use('/api', upgradeUser);
 app.use('/api', allocationProjectQuantity);
 app.use('/api', modeOfPayment);
-// app.use('/api', payment);
-
+app.use('/api', payment);
+app.use('/api', ngrok);
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'http://localhost';
 
 initializeDatabase().then(() => {
     app.listen(PORT, () => {
-        console.log(`🚀 Server is running on ${HOST}:${PORT}`);
+        console.log(`Server is running on ${HOST}:${PORT}`);
     });
 }).catch(err => {
-    console.error("❌ Failed to initialize database:", err.message);
+    console.error("Error executing SQL:", err.message);
     process.exit(1);
 });
