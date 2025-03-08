@@ -11,6 +11,9 @@ DROP TRIGGER IF EXISTS set_posts_timestamp ON posts;
 DROP TRIGGER IF EXISTS set_post_replies_timestamp ON post_replies;
 DROP INDEX IF EXISTS idx_posts_user_id;
 DROP INDEX IF EXISTS idx_post_replies_post_id;
+DROP TRIGGER IF EXISTS trigger_update_updated_at_users ON live_streaming_users;
+DROP TRIGGER IF EXISTS trigger_update_updated_at ON live_streaming;
+
 
 CREATE OR REPLACE FUNCTION update_timestamp_column()
     RETURNS TRIGGER AS $$
@@ -198,9 +201,51 @@ CREATE TABLE IF NOT EXISTS twitter_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- INSERT INTO twitter_tokens (username, access_token, refresh_token)
--- VALUES ('_ivan1290', 'SzBhUlZRVXBNZ1BYYmlPaXliSzVOc1FtN2UwZHF4NVMya1RLZndZVzJON1RzOjE3NDA0NzMyNDU4MTQ6MTowOmF0OjE', 'a055aWV1NV9jRmU4TVZ2WTBXWnpIVlIyUEV2MW5NZmowV0xQVjE5YUJ6eGd4OjE3NDA0NzMyNDU4MTQ6MTowOnJ0OjE')
--- ON CONFLICT (username) DO NOTHING;
+CREATE TABLE IF NOT EXISTS live_streaming(
+     id SERIAL PRIMARY KEY,
+     user_id INTEGER REFERENCES nimrod_users(id) ON DELETE CASCADE,
+     stream_id VARCHAR(255) NOT NULL,
+     stream_url VARCHAR(255) NOT NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     UNIQUE (user_id, stream_id)
+);
+
+CREATE TABLE IF NOT EXISTS live_streaming_users(
+   id SERIAL PRIMARY KEY,
+   live_streaming_id INTEGER REFERENCES live_streaming (id) ON DELETE CASCADE,
+   user_id INTEGER REFERENCES nimrod_users (id) ON DELETE CASCADE,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   UNIQUE (live_streaming_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS live_streaming_messages(
+  id SERIAL PRIMARY KEY,
+  live_streaming_id INTEGER REFERENCES live_streaming(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES nimrod_users(id) ON DELETE CASCADE,
+  message TEXT NOT NULL,
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+NEW.updated_at = NOW();
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_updated_at
+BEFORE UPDATE ON live_streaming
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER trigger_update_updated_at_users
+BEFORE UPDATE ON live_streaming_users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
 
 
 CREATE TRIGGER set_posts_timestamp

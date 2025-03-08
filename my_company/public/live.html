@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Streaming</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #videos { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    video { width: 45%; border: 2px solid #000; border-radius: 10px; }
+    button { margin: 10px; padding: 10px; font-size: 16px; }
+    #users { margin-top: 20px; font-size: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>Live Streaming</h1>
+<p id="status">Connecting...</p>
+
+<div id="users">Users in Stream: <span id="userList">0</span></div>
+
+<div id="videos">
+  <div>
+    <h3>Your Video</h3>
+    <video id="localVideo" autoplay playsinline muted></video>
+  </div>
+  <div>
+    <h3>Remote Video</h3>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
+</div>
+
+<button onclick="toggleMute()">Mute/Unmute</button>
+<button onclick="stopStream()">Stop Stream</button>
+
+<script>
+  const socket = io();
+  const streamId = window.location.pathname.split("/").pop();
+  let localStream, peerConnection;
+  const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+  async function startStreaming() {
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      document.getElementById("localVideo").srcObject = localStream;
+
+      peerConnection = new RTCPeerConnection(config);
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("candidate", { streamId, candidate: event.candidate });
+        }
+      };
+
+      peerConnection.ontrack = (event) => {
+        document.getElementById("remoteVideo").srcObject = event.streams[0];
+      };
+
+      socket.emit("joinStream", { streamId });
+
+      socket.on("updateUserList", (users) => {
+        document.getElementById("userList").innerText = users.length;
+      });
+
+      socket.on("offer", async ({ offer }) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit("answer", { streamId, answer });
+      });
+
+      socket.on("answer", async ({ answer }) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      });
+
+      socket.on("candidate", async ({ candidate }) => {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      });
+
+      socket.on("streamEnded", () => {
+        alert("Stream has ended!");
+        window.location.href = "/";
+      });
+
+      document.getElementById("status").innerText = "Live Stream Started!";
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Please allow camera and microphone access.");
+    }
+  }
+
+  function toggleMute() {
+    const audioTrack = localStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+    alert(audioTrack.enabled ? "Microphone Unmuted" : "Microphone Muted");
+  }
+
+  function stopStream() {
+    localStream.getTracks().forEach(track => track.stop());
+    socket.emit("leaveStream", { streamId });
+    alert("You left the stream.");
+    window.location.href = "/";
+  }
+
+  startStreaming();
+</script>
+
+</body>
+</html>

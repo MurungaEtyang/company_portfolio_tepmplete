@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { bookApplication, getAppointments } from "../services/projects/bookApplication";
+import { bookApplication, getAppointments } from "../../services/projects/bookApplication";
 
 const BookAppointment = () => {
     const [formData, setFormData] = useState({

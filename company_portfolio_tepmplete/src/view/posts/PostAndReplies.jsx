@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Send, Loader } from "lucide-react";
-import {createPost} from "../services/post/posts";
+import {createPost} from "../../services/post/posts";
 
 const PostAndReplies = () => {
     const [message, setMessage] = useState("");

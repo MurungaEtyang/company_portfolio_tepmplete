@@ -30,6 +30,7 @@ export const adminLogout = async () => {
         };
     } else {
         throw new Error("Failed to log out");
+
     }
 
 }

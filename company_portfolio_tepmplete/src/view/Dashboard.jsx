@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "./users/Login";
-import PostsList from "./PostsList";
-import PostAndReplies from "./PostAndReplies";
+import PostsList from "./posts/PostsList";
+import PostAndReplies from "./posts/PostAndReplies";
 import { FaArrowUp, FaShare } from "react-icons/fa6";
 import { Button } from "reactstrap";
 import ShareModal from "./components/ShareModal";
+import LiveStreaming from "./livestream/LiveStream";
 
 const GovernmentBanner = ({ isLoggedIn }) => {
     const navigate = useNavigate();
@@ -61,6 +62,7 @@ const GovernmentBanner = ({ isLoggedIn }) => {
                 <h1 className="text-6xl md:text-5xl sm:text-4xl font-bold leading-tight text-left">
                     Driving Kenya’s 🇰🇪: Growth through Innovation & Development.
                 </h1>
+
                 <p className="mt-4 text-lg text-left">
                     Highlighting <span className="text-blue-400 font-semibold">completed</span> &
                     <span className="text-green-400 font-semibold"> upcoming</span> government projects shaping the
@@ -152,5 +154,4 @@ const GovernmentBanner = ({ isLoggedIn }) => {
         </div>
     );
 };
-
 export default GovernmentBanner;

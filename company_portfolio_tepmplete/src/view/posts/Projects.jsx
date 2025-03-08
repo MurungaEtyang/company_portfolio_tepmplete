@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { get_projects } from "../services/projects/projects";
+import { get_projects } from "../../services/projects/projects";
 
 const Projects = () => {
     const [activeTab, setActiveTab] = useState(null);

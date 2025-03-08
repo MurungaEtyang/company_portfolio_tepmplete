@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Streaming</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        video { width: 30%; border: 2px solid black; border-radius: 10px; margin: 10px; }
+        #videos-container { display: flex; flex-wrap: wrap; justify-content: center; }
+        #data-container { display: flex; flex-direction: column; align-items: center; }
+        #data-container > p { margin: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Live Streaming</h1>
+
+<h2>Start a Stream</h2>
+<button onclick="startStream()">Start Streaming</button>
+<p id="streamUrl"></p>
+
+<h2>My Stream</h2>
+<video id="localVideo" autoplay playsinline muted></video>
+
+<div id="data-container">
+    <p>Dimensions: <span id="dimensions">N/A</span></p>
+    <p>Framerate: <span id="framerate">N/A</span> FPS</p>
+    <p>Bitrate: <span id="bitrate">N/A</span> kbps</p>
+</div>
+
+<hr>
+
+<h2>Join a Stream</h2>
+<input type="text" id="streamId" placeholder="Enter Stream ID">
+<button onclick="joinStream()">Join</button>
+
+<h2>Live Users</h2>
+<div id="users">Users in Stream: <span id="userCount">0</span></div>
+
+<h2>Remote Streams</h2>
+<div id="videos-container"></div>
+
+<script>
+    const socket = io();
+    const peerConnections = {};
+    const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+    let localStream;
+    let streamId;
+
+    async function startStream() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById("localVideo").srcObject = localStream;
+
+            // Request a stream ID from the server
+            const response = await fetch("/start-stream", { method: "POST" });
+            const data = await response.json();
+            streamId = data.streamId;
+
+            const streamUrl = `http://localhost:3000/live/${streamId}`;
+            document.getElementById("streamUrl").innerHTML =
+                `Share this URL: <a href="${streamUrl}" target="_blank">${streamUrl}</a>`;
+
+            // Join the stream as the broadcaster
+            socket.emit("joinStream", { streamId });
+
+        } catch (err) {
+            console.error("Error accessing camera:", err);
+            alert("Please allow camera and microphone access.");
+        }
+    }
+
+    function joinStream() {
+        streamId = document.getElementById("streamId").value;
+        if (!streamId) {
+            alert("Enter a valid Stream ID.");
+            return;
+        }
+        window.location.href = `/live/${streamId}`;
+    }
+
+    socket.on("updateUserList", (users) => {
+        document.getElementById("userCount").innerText = users.length;
+    });
+
+    // When a new user joins, create a peer connection
+    socket.on("newUser", async ({ userId }) => {
+        if (!localStream) return;
+
+        const peerConnection = new RTCPeerConnection(config);
+        peerConnections[userId] = peerConnection;
+
+        // Add our stream to the connection
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        // Handle ICE candidates
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit("candidate", { userId, candidate: event.candidate });
+            }
+        };
+
+        // When a remote track is received, show the video
+        peerConnection.ontrack = (event) => {
+            let remoteVideo = document.getElementById(userId);
+            if (!remoteVideo) {
+                remoteVideo = document.createElement("video");
+                remoteVideo.id = userId;
+                remoteVideo.autoplay = true;
+                remoteVideo.playsInline = true;
+                document.getElementById("videos-container").appendChild(remoteVideo);
+            }
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        // Create and send an offer
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit("offer", { userId, offer });
+    });
+
+    // When receiving an offer, send back an answer
+    socket.on("offer", async ({ userId, offer }) => {
+        const peerConnection = new RTCPeerConnection(config);
+        peerConnections[userId] = peerConnection;
+
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit("candidate", { userId, candidate: event.candidate });
+            }
+        };
+
+        peerConnection.ontrack = (event) => {
+            let remoteVideo = document.getElementById(userId);
+            if (!remoteVideo) {
+                remoteVideo = document.createElement("video");
+                remoteVideo.id = userId;
+                remoteVideo.autoplay = true;
+                remoteVideo.playsInline = true;
+                document.getElementById("videos-container").appendChild(remoteVideo);
+            }
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit("answer", { userId, answer });
+    });
+
+    // When receiving an answer, complete the connection
+    socket.on("answer", async ({ userId, answer }) => {
+        await peerConnections[userId].setRemoteDescription(new RTCSessionDescription(answer));
+    });
+
+    // When receiving an ICE candidate, add it
+    socket.on("candidate", async ({ userId, candidate }) => {
+        if (peerConnections[userId]) {
+            await peerConnections[userId].addIceCandidate(new RTCIceCandidate(candidate));
+        }
+    });
+
+    // Handle user disconnecting
+    socket.on("userDisconnected", (userId) => {
+        if (peerConnections[userId]) {
+            peerConnections[userId].close();
+            delete peerConnections[userId];
+            const videoElement = document.getElementById(userId);
+            if (videoElement) videoElement.remove();
+        }
+    });
+
+    // Show video streaming data
+    const videoElement = document.getElementById("localVideo");
+    videoElement.addEventListener("playing", () => {
+        const videoTrack = localStream.getVideoTracks()[0];
+        const dimensions = `${videoTrack.getSettings().width}x${videoTrack.getSettings().height}`;
+        document.getElementById("dimensions").innerText = dimensions;
+        const framerate = videoTrack.getSettings().frameRate;
+        document.getElementById("framerate").innerText = Math.floor(framerate);
+        const bitrate = videoTrack.getSettings().bitrate / 1000;
+        document.getElementById("bitrate").innerText = Math.floor(bitrate);
+    });
+
+</script>
+
+</body>
+</html>
